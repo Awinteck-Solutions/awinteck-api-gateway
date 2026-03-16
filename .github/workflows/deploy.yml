@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t api-gateway --env-file .env.gateway .
+          docker build -t api-gateway --env-file envs/.env.gateway .
 
       - name: Tag image
         run: |
