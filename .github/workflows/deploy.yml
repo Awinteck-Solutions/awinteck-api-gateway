@@ -52,5 +52,5 @@ jobs:
             docker rm api-gateway || true
             docker run -d -p 9000:9000 \
               --name api-gateway \
-              --env-file /home/ubuntu/envs/api-gateway.env \
+              --env-file /home/ubuntu/envs/.env.gateway \
               ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway
