@@ -1,0 +1,55 @@
+name: Deploy API Gateway to AWS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password \
+          | docker login --username AWS \
+          --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t api-gateway .
+
+      - name: Tag image
+        run: |
+          docker tag api-gateway:latest \
+          ${{ secrets.ECR_REGISTRY }}/api-gateway:latest
+
+      - name: Push image to ECR
+        run: |
+          docker push \
+          ${{ secrets.ECR_REGISTRY }}/api-gateway:latest
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull ${{ secrets.ECR_REGISTRY }}/api-gateway:latest
+            docker stop api-gateway || true
+            docker rm api-gateway || true
+            docker run -d -p 3000:3000 \
+              --name api-gateway \
+              ${{ secrets.ECR_REGISTRY }}/api-gateway:latest
