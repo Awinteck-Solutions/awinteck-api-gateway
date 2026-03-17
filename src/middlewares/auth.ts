@@ -1,6 +1,8 @@
 import axios from 'axios';
 import express from 'express';
 import { GatewayRequest } from '../util/GatewayRequest';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const PUBLIC_PATHS: Array<RegExp> = [
   /^\/health(?:\/|$)/,

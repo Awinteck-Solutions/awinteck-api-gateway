@@ -5,7 +5,8 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { authenticateApiKey } from './middlewares/auth';
 import { enforceRateLimit } from './middlewares/rateLimit';
 import { GatewayRequest } from './util/GatewayRequest';
-
+import dotenv from 'dotenv';
+dotenv.config();
 // GET PRODUCTION OR LOCAL ENVIRONMENT VARIABLES
 const authServiceUrl = process.env.AUTH_SERVICE_URL;
 const inventoryServiceUrl = process.env.INVENTORY_SERVICE_URL;
@@ -13,6 +14,11 @@ const invoiceServiceUrl = process.env.INVOICE_SERVICE_URL;
 const ibulkServiceUrl = process.env.IBULK_SERVICE_URL;
 const port = process.env.PORT;
 
+console.log('authServiceUrl', authServiceUrl);
+console.log('inventoryServiceUrl', inventoryServiceUrl);
+console.log('invoiceServiceUrl', invoiceServiceUrl);
+console.log('ibulkServiceUrl', ibulkServiceUrl);
+console.log('port', port);
 if (!authServiceUrl || !inventoryServiceUrl || !invoiceServiceUrl || !ibulkServiceUrl || !port) {
     throw new Error('Missing environment variables');
 }
