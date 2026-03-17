@@ -8,7 +8,7 @@ import { GatewayRequest } from './util/GatewayRequest';
 import { config } from './util/config';
 
 // GET PRODUCTION OR LOCAL ENVIRONMENT VARIABLES
-const { port, authServiceUrl, inventoryServiceUrl, invoiceServiceUrl, templateServiceUrl, ibulkServiceUrl } = config;
+const { port, authServiceUrl, inventoryServiceUrl, invoiceServiceUrl, ibulkServiceUrl } = config;
 
 
 
@@ -32,7 +32,6 @@ const serviceMap: { [key: string]: string } = {
     '/inventory': inventoryServiceUrl,
     '/invoice': invoiceServiceUrl,
     '/auth': authServiceUrl,
-    '/template': templateServiceUrl,
     '/ibulk': ibulkServiceUrl,
 };
 

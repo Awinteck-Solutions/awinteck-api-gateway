@@ -3,6 +3,7 @@ import path from 'path';
 
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.gateway' : '.env.dev';
+console.log('envFile', envFile);
 dotenv.config({ path: path.resolve(__dirname, `../../${envFile}`) });
 
 export const config = {
@@ -10,6 +11,6 @@ export const config = {
     authServiceUrl: process.env.AUTH_SERVICE_URL || '',
     inventoryServiceUrl: process.env.INVENTORY_SERVICE_URL || '',
     invoiceServiceUrl: process.env.INVOICE_SERVICE_URL || '',
-    templateServiceUrl: process.env.TEMPLATE_SERVICE_URL || '',
+    // templateServiceUrl: process.env.TEMPLATE_SERVICE_URL || '',
     ibulkServiceUrl: process.env.IBULK_SERVICE_URL || '',
 };
