@@ -5,11 +5,17 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { authenticateApiKey } from './middlewares/auth';
 import { enforceRateLimit } from './middlewares/rateLimit';
 import { GatewayRequest } from './util/GatewayRequest';
-import { config } from './util/config';
 
 // GET PRODUCTION OR LOCAL ENVIRONMENT VARIABLES
-const { port, authServiceUrl, inventoryServiceUrl, invoiceServiceUrl, ibulkServiceUrl } = config;
+const authServiceUrl = process.env.AUTH_SERVICE_URL;
+const inventoryServiceUrl = process.env.INVENTORY_SERVICE_URL;
+const invoiceServiceUrl = process.env.INVOICE_SERVICE_URL;
+const ibulkServiceUrl = process.env.IBULK_SERVICE_URL;
+const port = process.env.PORT;
 
+if (!authServiceUrl || !inventoryServiceUrl || !invoiceServiceUrl || !ibulkServiceUrl || !port) {
+    throw new Error('Missing environment variables');
+}
 
 
 const app = express();

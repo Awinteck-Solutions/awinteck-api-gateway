@@ -1,7 +1,6 @@
 import axios from 'axios';
 import express from 'express';
 import { GatewayRequest } from '../util/GatewayRequest';
-import { config } from '../util/config';
 
 const PUBLIC_PATHS: Array<RegExp> = [
   /^\/health(?:\/|$)/,
@@ -9,7 +8,7 @@ const PUBLIC_PATHS: Array<RegExp> = [
   /^\/auth\/api\/token(?:\/|$)/,
 ];
 
-const AUTH_SERVICE_URL = config.authServiceUrl || 'http://localhost:4040';
+const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:9001';
 /**
  * 1. Checks for Authorization header (API Key or JWT).
  * 2. Calls the internal Auth Service to validate the key/token.
