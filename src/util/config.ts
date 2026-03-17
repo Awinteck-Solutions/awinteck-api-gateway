@@ -2,9 +2,11 @@ import * as dotenv from 'dotenv';
 import path from 'path';
 
 
-const envFile = process.env.NODE_ENV === 'production' ? '.env.gateway' : '.env.dev';
-console.log('envFile', envFile);
-dotenv.config({ path: path.resolve(__dirname, `../../${envFile}`) });
+if (process.env.NODE_ENV !== "production") {
+    dotenv.config({ path: ".env.gateway" });
+} else { 
+    dotenv.config({ path: path.resolve(__dirname, `../../.env.dev`) });
+}
 
 export const config = {
     port: process.env.PORT || 9000,
