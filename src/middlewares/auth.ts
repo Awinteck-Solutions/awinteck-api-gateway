@@ -4,6 +4,7 @@ import { GatewayRequest } from '../util/GatewayRequest';
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 const PUBLIC_PATHS: Array<RegExp> = [
     /^\/health(?:\/|$)/,
     /^\/auth\/health(?:\/|$)/,

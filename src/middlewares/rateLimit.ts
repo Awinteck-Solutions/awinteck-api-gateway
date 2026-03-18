@@ -11,7 +11,7 @@ const PUBLIC_PATHS: Array<RegExp> = [
 const TIER_LIMITS: Record<string, number> = {
   BASIC: 10,
   PRO: 100,
-  ENTERPRISE: 500,
+  ENTERPRISE: 501,
 };
 
 type Usage = { count: number; resetTime: number };
