@@ -5,7 +5,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const PUBLIC_PATHS: Array<RegExp> = [
-  /^\/health(?:\/|$)/,
+    /^\/health(?:\/|$)/,
+    /^\/auth\/health(?:\/|$)/,
   /^\/auth\/api\/register(?:\/|$)/,
   /^\/auth\/api\/token(?:\/|$)/,
 ];

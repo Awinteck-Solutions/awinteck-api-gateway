@@ -2,7 +2,8 @@ import express from 'express';
 import { GatewayRequest } from '../util/GatewayRequest';
 
 const PUBLIC_PATHS: Array<RegExp> = [
-  /^\/health(?:\/|$)/,
+    /^\/health(?:\/|$)/,
+    /^\/auth\/health(?:\/|$)/,
   /^\/auth\/api\/register(?:\/|$)/,
   /^\/auth\/api\/token(?:\/|$)/,
 ];

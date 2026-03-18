@@ -1,0 +1,499 @@
+{
+  "info": {
+    "_postman_id": "d6f80f44-36f1-4e49-8c90-5b0013a4f8c1",
+    "name": "API Gateway - AUTH + IBULK",
+    "description": "Gateway-first Postman collection for API-GATEWAY, AUTH, and IBULK. All requests are routed through API-GATEWAY base URL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gatewayBaseUrl", "value": "http://localhost:9000" },
+    { "key": "developerId", "value": "dev_demo_001" },
+    { "key": "subscriptionTier", "value": "BASIC" },
+    { "key": "service", "value": "ibulk" },
+    { "key": "apiKey", "value": "" },
+    { "key": "accessToken", "value": "" },
+    { "key": "templateId", "value": "" },
+    { "key": "senderIdentityId", "value": "" },
+    { "key": "audienceId", "value": "" },
+    { "key": "audienceSnapshotId", "value": "" },
+    { "key": "campaignId", "value": "" },
+    { "key": "providerMessageId", "value": "" },
+    { "key": "unsubscribeToken", "value": "PASTE_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "API-GATEWAY",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/health",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AUTH (via gateway /auth)",
+      "item": [
+        {
+          "name": "GET /auth/health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/auth/health",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["auth", "health"]
+            }
+          }
+        },
+        {
+          "name": "POST /auth/api/register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"developerId\": \"{{developerId}}\",\n  \"subscriptionTier\": \"{{subscriptionTier}}\",\n  \"service\": \"{{service}}\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/auth/api/register",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["auth", "api", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.apiKey) pm.collectionVariables.set('apiKey', json.apiKey);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/api/token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"apiKey\": \"{{apiKey}}\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/auth/api/token",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["auth", "api", "token"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.accessToken) pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/api/validate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/auth/api/validate",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["auth", "api", "validate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "IBULK (via gateway /ibulk)",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          { "key": "token", "value": "{{accessToken}}", "type": "string" }
+        ]
+      },
+      "item": [
+        {
+          "name": "GET /ibulk/health",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/health",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "health"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api/templates",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/templates?limit=50&withContent=false",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "templates"],
+              "query": [
+                { "key": "limit", "value": "50" },
+                { "key": "withContent", "value": "false" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/templates",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"WelcomeEmail\",\n  \"channel\": \"email\",\n  \"subject\": \"Welcome, {{firstName}}!\",\n  \"body\": \"<h1>Hello {{firstName}}</h1><p>Your code is {{code}}</p>\",\n  \"engine\": \"handlebars\",\n  \"sampleData\": { \"firstName\": \"Sam\", \"code\": \"123456\" }\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/templates",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "templates"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.template?._id || json?.template?.id;",
+                  "  if (id) pm.collectionVariables.set('templateId', id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ibulk/api/templates/:id/preview",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": { \"firstName\": \"Amina\", \"code\": \"ABC-999\" }\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/templates/{{templateId}}/preview",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "templates", "{{templateId}}", "preview"]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/sender-identities",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MySMTP\",\n  \"type\": \"smtp\",\n  \"fromNameDefault\": \"My Company\",\n  \"fromEmailDefault\": \"no-reply@mycompany.com\",\n  \"replyToEmail\": \"support@mycompany.com\",\n  \"secrets\": {\n    \"host\": \"smtp.mailtrap.io\",\n    \"port\": 587,\n    \"secure\": false,\n    \"username\": \"SMTP_USERNAME\",\n    \"password\": \"SMTP_PASSWORD\"\n  }\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/sender-identities",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "sender-identities"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.senderIdentity?._id || json?.senderIdentity?.id;",
+                  "  if (id) pm.collectionVariables.set('senderIdentityId', id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ibulk/api/sender-identities/:id/test-email",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"test.receiver@example.com\",\n  \"subject\": \"IBULK test email\",\n  \"html\": \"<p>Hello from IBULK</p>\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/sender-identities/{{senderIdentityId}}/test-email",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "sender-identities", "{{senderIdentityId}}", "test-email"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api/sender-identities/:id/verification",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/sender-identities/{{senderIdentityId}}/verification",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "sender-identities", "{{senderIdentityId}}", "verification"]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/audiences",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MyPushAudience\",\n  \"sourceType\": \"push\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/audiences",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "audiences"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.audience?._id || json?.audience?.id;",
+                  "  if (id) pm.collectionVariables.set('audienceId', id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ibulk/api/audiences/:id/import",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipients\": [\n    { \"recipient\": \"user1@example.com\", \"fields\": { \"firstName\": \"User\", \"code\": \"111\" } },\n    { \"recipient\": \"user2@example.com\", \"fields\": { \"firstName\": \"User\", \"code\": \"222\" } }\n  ],\n  \"metadata\": { \"source\": \"postman\" }\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/audiences/{{audienceId}}/import",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "audiences", "{{audienceId}}", "import"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json && json.audienceSnapshotId) pm.collectionVariables.set('audienceSnapshotId', json.audienceSnapshotId);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /ibulk/api/audiences/:id/resolve",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/audiences/{{audienceId}}/resolve",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "audiences", "{{audienceId}}", "resolve"]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/campaigns",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"WelcomeCampaign\",\n  \"channel\": \"email\",\n  \"templateId\": \"{{templateId}}\",\n  \"senderIdentityId\": \"{{senderIdentityId}}\",\n  \"audienceId\": \"{{audienceId}}\",\n  \"audienceSnapshotId\": \"{{audienceSnapshotId}}\",\n  \"schedule\": { \"mode\": \"immediate\" }\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/campaigns",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "campaigns"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  const id = json?.campaign?._id || json?.campaign?.id;",
+                  "  if (id) pm.collectionVariables.set('campaignId', id);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /ibulk/api/campaigns/:id",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/campaigns/{{campaignId}}",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "campaigns", "{{campaignId}}"]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/campaigns/:id/launch",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/campaigns/{{campaignId}}/launch",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "campaigns", "{{campaignId}}", "launch"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api/campaigns/:id/status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/campaigns/{{campaignId}}/status",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "campaigns", "{{campaignId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api/campaigns/:id/messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/campaigns/{{campaignId}}/messages?limit=50",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "campaigns", "{{campaignId}}", "messages"],
+              "query": [
+                { "key": "limit", "value": "50" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/webhooks/:provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerMessageId\": \"{{providerMessageId}}\",\n  \"event\": \"delivered\",\n  \"deliveredAt\": \"2026-02-18T12:00:00.000Z\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/webhooks/mock",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "webhooks", "mock"]
+            }
+          }
+        },
+        {
+          "name": "POST /ibulk/api/sms/inbound",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "content-type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"from\": \"+15551234567\",\n  \"text\": \"STOP\"\n}\n"
+            },
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/sms/inbound",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "sms", "inbound"]
+            }
+          }
+        },
+        {
+          "name": "GET /ibulk/api/unsubscribe/:token",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{gatewayBaseUrl}}/ibulk/api/unsubscribe/{{unsubscribeToken}}",
+              "host": ["{{gatewayBaseUrl}}"],
+              "path": ["ibulk", "api", "unsubscribe", "{{unsubscribeToken}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
