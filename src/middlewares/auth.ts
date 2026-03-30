@@ -26,7 +26,7 @@ const AUTH_SERVICE_URL = normalizeServiceUrl(process.env.AUTH_SERVICE_URL);
 /**
  * 1. Checks for Authorization header (API Key or JWT).
  * 2. Calls the internal Auth Service to validate the key/token.
- * 3. Attaches developer data (ID, Tier) to the request object.
+ * 3. Attaches developer data (ID, Tier) to the request object. l
  */
 
 
