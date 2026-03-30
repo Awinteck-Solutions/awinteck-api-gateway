@@ -28,17 +28,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t api-gateway .
+          docker build -t api-gateway:${{ github.sha }} .
 
       - name: Tag image
         run: |
-          docker tag api-gateway:latest \
-          ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway
+          docker tag api-gateway:${{ github.sha }} \
+          ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway:${{ github.sha }}
 
       - name: Push image to ECR
         run: |
           docker push \
-          ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway
+          ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway:${{ github.sha }}
 
       - name: Deploy on EC2
         uses: appleboy/ssh-action@v1
@@ -47,10 +47,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway
+            docker pull ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway:${{ github.sha }}
             docker stop api-gateway || true
             docker rm api-gateway || true
             docker run -d -p 9000:9000 \
               --name api-gateway \
               --env-file envs/.env.gateway \
-              ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway
+              ${{ secrets.ECR_REGISTRY }}/awinteck-services:api-gateway:${{ github.sha }}
