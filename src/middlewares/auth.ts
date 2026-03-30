@@ -12,7 +12,17 @@ const PUBLIC_PATHS: Array<RegExp> = [
   /^\/auth\/api\/token(?:\/|$)/,
 ];
 
-const AUTH_SERVICE_URL = process.env.AUTH_SERVICE_URL || 'http://localhost:9001';
+const normalizeServiceUrl = (raw: string | undefined): string => {
+    const cleaned = String(raw ?? '').trim().replace(/^['"]|['"]$/g, '');
+    if (!cleaned) return 'http://localhost:9001';
+    try {
+        return new URL(cleaned).toString().replace(/\/$/, '');
+    } catch {
+        return 'http://localhost:9001';
+    }
+};
+
+const AUTH_SERVICE_URL = normalizeServiceUrl(process.env.AUTH_SERVICE_URL);
 /**
  * 1. Checks for Authorization header (API Key or JWT).
  * 2. Calls the internal Auth Service to validate the key/token.

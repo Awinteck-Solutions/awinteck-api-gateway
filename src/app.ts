@@ -8,10 +8,22 @@ import { GatewayRequest } from './util/GatewayRequest';
 import dotenv from 'dotenv';
 dotenv.config();
 // GET PRODUCTION OR LOCAL ENVIRONMENT VARIABLES
-const authServiceUrl = process.env.AUTH_SERVICE_URL;
-const inventoryServiceUrl = process.env.INVENTORY_SERVICE_URL;
-const invoiceServiceUrl = process.env.INVOICE_SERVICE_URL;
-const ibulkServiceUrl = process.env.IBULK_SERVICE_URL;
+const normalizeServiceUrl = (raw: string | undefined, envName: string): string => {
+    const cleaned = String(raw ?? '').trim().replace(/^['"]|['"]$/g, '');
+    if (!cleaned) {
+        throw new Error(`Missing environment variable: ${envName}`);
+    }
+    try {
+        return new URL(cleaned).toString().replace(/\/$/, '');
+    } catch {
+        throw new Error(`Invalid URL in ${envName}: ${raw}`);
+    }
+};
+
+const authServiceUrl = normalizeServiceUrl(process.env.AUTH_SERVICE_URL, 'AUTH_SERVICE_URL');
+const inventoryServiceUrl = normalizeServiceUrl(process.env.INVENTORY_SERVICE_URL, 'INVENTORY_SERVICE_URL');
+const invoiceServiceUrl = normalizeServiceUrl(process.env.INVOICE_SERVICE_URL, 'INVOICE_SERVICE_URL');
+const ibulkServiceUrl = normalizeServiceUrl(process.env.IBULK_SERVICE_URL, 'IBULK_SERVICE_URL');
 const port = process.env.PORT;
 
 console.log('authServiceUrl', authServiceUrl);
@@ -19,7 +31,7 @@ console.log('inventoryServiceUrl', inventoryServiceUrl);
 console.log('invoiceServiceUrl', invoiceServiceUrl);
 console.log('ibulkServiceUrl', ibulkServiceUrl);
 console.log('port', port);
-if (!authServiceUrl || !inventoryServiceUrl || !invoiceServiceUrl || !ibulkServiceUrl || !port) {
+if (!port) {
     throw new Error('Missing environment variables');
 }
 
